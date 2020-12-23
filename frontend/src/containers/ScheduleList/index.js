@@ -8,7 +8,7 @@ import { useHistory } from 'react-router';
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import { getSchedules, deleteSchedule, postSaveSchedule } from "services/api";
+import { getSchedules, deleteSchedule, postSaveSchedule, postRenameSchedule } from "services/api";
 import { setLoading } from "redux/modules/appState";
 import { makeAtLeastMs } from "utils/promise";
 import Schedule from "containers/ViewSchedule/Schedule";
@@ -53,7 +53,8 @@ function ScheduleList() {
 
   async function duplicateSchedule(schedule) {
     dispatch(setLoading(true));
-    await postSaveSchedule(auth.userId, schedule.schedule_items);
+    const { data: { id } } = await postSaveSchedule(auth.userId, schedule.schedule_items);
+    await postRenameSchedule(auth.userId, id, "Copy of "+(schedule.name||"Untitled"));
     const {
       data: { user_schedules }
     } = await makeAtLeastMs(getSchedules(auth.userId), 1000);
