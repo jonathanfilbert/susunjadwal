@@ -8,11 +8,12 @@ import { useHistory } from 'react-router';
 
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import { getSchedules, deleteSchedule } from "services/api";
+import { getSchedules, deleteSchedule, postSaveSchedule, postRenameSchedule } from "services/api";
 import { setLoading } from "redux/modules/appState";
 import { makeAtLeastMs } from "utils/promise";
 import Schedule from "containers/ViewSchedule/Schedule";
-import clipboardImg from "assets/Clipboard.svg";
+import copyDuplicateImg from "assets/Clipboard.svg";
+import shareImg from "assets/share.png";
 import deleteImg from "assets/Delete.svg";
 import { decodeHtmlEntity } from 'utils/string'
 import EditIcon from "assets/EditSchedule/EditIcon";
@@ -43,6 +44,17 @@ function ScheduleList() {
   async function performDeleteSchedule(userId, scheduleId) {
     dispatch(setLoading(true));
     await makeAtLeastMs(deleteSchedule(userId, scheduleId), 1000);
+    const {
+      data: { user_schedules }
+    } = await makeAtLeastMs(getSchedules(auth.userId), 1000);
+    setSchedules(user_schedules);
+    dispatch(setLoading(false));
+  }
+
+  async function duplicateSchedule(schedule) {
+    dispatch(setLoading(true));
+    const { data: { id } } = await postSaveSchedule(auth.userId, schedule.schedule_items);
+    await postRenameSchedule(auth.userId, id, "Copy of "+(schedule.name||"Untitled"));
     const {
       data: { user_schedules }
     } = await makeAtLeastMs(getSchedules(auth.userId), 1000);
@@ -83,11 +95,15 @@ function ScheduleList() {
                   <h2>{decodeHtmlEntity(schedule.name) || "Untitled"}</h2>
                 </Link>
                 <CardActionContainer>
+                  <ImageButton
+                    src={copyDuplicateImg}
+                    onClick={() => duplicateSchedule(schedule)}
+                  />
                   <CopyToClipboard
                     text={`${window.location.href}/${schedule.id}`}
                     onCopy={showAlertCopy}
                   >
-                    <ImageButton src={clipboardImg} />
+                    <ImageButton src={shareImg} />
                   </CopyToClipboard>
                   <ImageButton
                     src={deleteImg}
@@ -174,6 +190,7 @@ const CardContainer = styled.div`
 
 const ImageButton = styled.button`
   background: url(${({ src }) => src}) no-repeat;
+  background-size: contain;
   cursor: pointer;
   height: 24px;
   width: 24px;
