@@ -14,7 +14,7 @@ Application deployed: https://susunjadwal.cs.ui.ac.id/ \
 Original repository from RISTEK: https://github.com/RistekCSUI/susunjadwal/
 
 
-# Developed by OSSD Team
+## Developed by OSSD Team
 - **Ubah Jadwal**\
 allow user edit their schedule after saving them on *user_schedule* 
 
@@ -22,7 +22,7 @@ allow user edit their schedule after saving them on *user_schedule*
 user can duplicating their saved schedule.
 
 
-# Next Development Issue
+## Next Development Issue
 - **Refine The Frontend User Interface, Icons, Assets, etc**\
 keep the design consistent
 
